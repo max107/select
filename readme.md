@@ -1,3 +1,7 @@
+# Скриншоты
+
+![Скрин](https://raw.githubusercontent.com/studio107/select/master/screen.png)
+
 # Использование jQuery плагина
 
 ```js
