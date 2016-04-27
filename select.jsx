@@ -363,6 +363,8 @@ export default class Select extends Component {
                                 this.setState({
                                     options,
                                     isLoading: false
+                                }, () => {
+                                    this.focusNextOption();
                                 });
                             });
                         } else {
@@ -427,6 +429,7 @@ export default class Select extends Component {
 
     renderOption(item, index) {
         return React.createElement(this.props.optionComponent, {
+            labelKey: this.props.labelKey,
             onClick: !item.disabled ? this.selectOption.bind(this, item) : null,
             onMouseOver: !item.disabled ? this.focusOption.bind(this, item) : null,
             key: index,
@@ -462,12 +465,13 @@ export default class Select extends Component {
     }
 
     selectOption(currentOption) {
+        const { isAsync, options, valueKey } = this.props;
         this.setState({
             currentOption,
             isOpen: false
         }, () => {
             this._unbindCloseMenuIfClickedOutside();
-            this.fireChangeEvent(currentOption.value, this.props.options);
+            this.fireChangeEvent(currentOption[valueKey], isAsync ? this.state.options : options);
         });
     }
 
