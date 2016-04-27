@@ -363,8 +363,6 @@ export default class Select extends Component {
                                 this.setState({
                                     options,
                                     isLoading: false
-                                }, () => {
-                                    this.focusNextOption();
                                 });
                             });
                         } else {
@@ -428,12 +426,13 @@ export default class Select extends Component {
     }
 
     renderOption(item, index) {
+        const { valueKey, labelKey } = this.props;
         return React.createElement(this.props.optionComponent, {
-            labelKey: this.props.labelKey,
+            labelKey: labelKey,
             onClick: !item.disabled ? this.selectOption.bind(this, item) : null,
             onMouseOver: !item.disabled ? this.focusOption.bind(this, item) : null,
             key: index,
-            isFocused: this.state.focusedOption.value == item.value,
+            isFocused: this.state.focusedOption[valueKey] == item[valueKey],
             item: item,
             disabled: Boolean(item.disabled)
         })
