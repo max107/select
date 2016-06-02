@@ -283,7 +283,7 @@ export default class Select extends Component {
                  tabIndex="1"
                  onKeyDown={this.handleKeyDown.bind(this)}
                  className="select-container">
-                <input type="hidden" value={this.state.currentOption.value} name={this.props.name}/>
+                <input type="hidden" value={this.state.currentOption.value || ''} name={this.props.name}/>
 
                 <div className="select-input"
                      tabIndex="-1"
