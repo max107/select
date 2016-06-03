@@ -25,6 +25,7 @@ export default class SelectBase extends Component {
         noResultsAsync: PropTypes.string,
         minFilterText: PropTypes.string,
         loadingText: PropTypes.string,
+        createText: PropTypes.string,
         onChangeInterval: PropTypes.number,
         minFilterLength: PropTypes.number,
         clearable: PropTypes.bool,
@@ -47,6 +48,7 @@ export default class SelectBase extends Component {
         loadingText: 'Поиск...',
         noResults: 'Результаты отсутствуют',
         noResultsAsync: 'Результаты отсутствуют. Введите текст для поиска...',
+        createText: 'Добавить?',
         valueKey: 'value',
         labelKey: 'label',
         enableSearch: true,
@@ -152,6 +154,7 @@ export default class SelectBase extends Component {
         if (JSON.stringify(options) !== JSON.stringify(this.props.options)) {
             let value = nextProps.value || nextProps.defaultValue;
             this.setState({
+                all: options,
                 options,
                 currentOption: this.findOptionByValue(value, options)
             });
@@ -302,19 +305,21 @@ export default class SelectBase extends Component {
     }
 
     handleFilterOptions(e) {
-        if ([17, 16, 91, 18, 13, 27].indexOf(e.keyCode) > -1) {
+        if ([18, 13, 27].indexOf(e.keyCode) > -1) {
             return;
         }
 
+        const { onCreate } = this.props;
         const { filterValue } = this.state;
 
         const { isAsync, onInputChange, onChangeInterval, minFilterLength, minFilterText } = this.props;
         if (isAsync && onInputChange) {
             clearTimeout(this._timer);
 
-            if (value.length < minFilterLength) {
+            if (filterValue.length < minFilterLength) {
                 this.setState({
                     stateMessage: minFilterText + ' ' + minFilterLength,
+                    all: [],
                     options: [],
                     isLoading: false
                 });
@@ -329,11 +334,13 @@ export default class SelectBase extends Component {
                             promise.then(options => {
                                 this.setState({
                                     options,
+                                    all: [],
                                     isLoading: false
                                 });
                             });
                         } else {
                             this.setState({
+                                all: [],
                                 options: [],
                                 isLoading: false
                             });
@@ -344,7 +351,7 @@ export default class SelectBase extends Component {
         } else {
             let filteredOptions = this.filterOptions(filterValue);
             this.setState({
-                stateMessage: filterValue.length > 0 ? this.renderCreateMessage() : undefined,
+                stateMessage: onCreate && filterValue.length > 0 ? this.renderCreateMessage() : undefined,
                 options: filteredOptions
             });
         }
@@ -355,8 +362,9 @@ export default class SelectBase extends Component {
     }
 
     renderCreateMessage() {
+        const { createText } = this.props;
         return <span onClick={this.handleCreate.bind(this)}
-                     className="select-create-input">Добавить?</span>;
+                     className="select-create-input">{createText}</span>;
     }
 
     clearValue() {
@@ -386,10 +394,9 @@ export default class SelectBase extends Component {
     }
 
     renderSearchInput() {
-        const { enableSearch, isAsync } = this.props;
-        const { all } = this.state;
+        const { enableSearch } = this.props;
 
-        if (enableSearch === false || isAsync === false && all.length === 0) {
+        if (enableSearch === false) {
             return null;
         }
 
