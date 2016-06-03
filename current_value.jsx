@@ -7,15 +7,24 @@ import React, { Component, PropTypes } from 'react';
 
 export default class CurrentValue extends Component {
     static propTypes = {
-        placeholder: PropTypes.oneOfType([
-            PropTypes.string,
-            PropTypes.number
-        ]),
-        item: PropTypes.object
+        option: PropTypes.object.isRequired,
+        name: PropTypes.string,
+        labelKey: PropTypes.string.isRequired,
+        valueKey: PropTypes.string.isRequired
+    };
+
+    static defaultProps = {
+        name: null
     };
 
     render() {
-        const { placeholder, item } = this.props;
-        return item.value ? <span className="current-value">{item.label}</span> : <span className="placeholder">{String(placeholder)}</span>;
+        const { option, valueKey, labelKey, name } = this.props;
+
+        return (
+            <span>
+                <input type="hidden" value={option[valueKey] || ''} name={name}/>
+                <span className="current-value">{option[labelKey]}</span>
+            </span>
+        );
     }
 }

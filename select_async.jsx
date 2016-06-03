@@ -23,6 +23,7 @@ export default class SelectAsync extends Component {
     componentWillMount() {
         const { isAsync, actions, params } = this.props;
         if (isAsync === false) {
+            console.log(actions);
             actions.fetchOptionsIfNeeded(params);
         }
     }

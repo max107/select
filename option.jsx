@@ -10,28 +10,19 @@ export default class Option extends Component {
     static propTypes = {
         onClick: PropTypes.func,
         onMouseOver: PropTypes.func,
-        item: PropTypes.object.isRequired,
+        option: PropTypes.object.isRequired,
         disabled: PropTypes.bool.isRequired,
+        isFocused: PropTypes.bool.isRequired,
         labelKey: PropTypes.string.isRequired
     };
 
     static defaultProps = {
-        className: "option-item",
-        labelKey: "label"
+        className: "option-item"
     };
 
     render() {
-        const { disabled, labelKey, className, onClick, onMouseOver, item, isFocused } = this.props;
-        let cls = className;
-        if (isFocused) {
-            cls += " active";
-        }
-        if (disabled) {
-            cls += " disabled";
-        }
-        return <div
-            onClick={onClick}
-            onMouseOver={onMouseOver}
-            className={cls}>{item[labelKey]}</div>;
+        const { disabled, labelKey, className, onClick, onMouseOver, option, isFocused } = this.props;
+        return <div onClick={onClick} onMouseOver={onMouseOver}
+                    className={className + (isFocused ? ' active' : '') + (disabled ? ' disabled' : '')}>{option[labelKey]}</div>;
     }
 }
