@@ -445,13 +445,19 @@ export default class SelectBase extends Component {
     }
 
     focusOption(focusedOption) {
-        this.setState({focusedOption});
+        this.setState({
+            focusedOption
+        });
     }
 
     selectOption(currentOption) {
         const { isAsync, valueKey } = this.props;
         const { options } = this.state;
-        this.setState({currentOption, isOpen: false}, () => {
+
+        this.setState({
+            currentOption,
+            isOpen: false
+        }, () => {
             this._unbindCloseMenuIfClickedOutside();
             this.fireChangeEvent(currentOption[valueKey], isAsync ? this.state.options : options);
         });
