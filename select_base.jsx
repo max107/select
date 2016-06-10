@@ -333,7 +333,7 @@ export default class SelectBase extends Component {
                         if (typeof promise === "object") {
                             promise.then(options => {
                                 this.setState({
-                                    options,
+                                    options: options || [],
                                     all: [],
                                     isLoading: false
                                 });
@@ -402,7 +402,7 @@ export default class SelectBase extends Component {
 
         return (
             <div className="search-input">
-                <input ref="searchInput" type="text" placeholder="Поиск..."
+                <input ref="searchInput" type="text" placeholder="Поиск..." autoComplete="off"
                        value={this.state.filterValue}
                        onChange={e => this.setState({filterValue: e.target.value})}
                        onKeyUp={this.handleFilterOptions.bind(this)}/>
@@ -459,7 +459,7 @@ export default class SelectBase extends Component {
             isOpen: false
         }, () => {
             this._unbindCloseMenuIfClickedOutside();
-            this.fireChangeEvent(currentOption[valueKey], isAsync ? this.state.options : options);
+            this.fireChangeEvent(currentOption[valueKey], currentOption, isAsync ? this.state.options : options);
         });
     }
 
@@ -469,9 +469,15 @@ export default class SelectBase extends Component {
         }
     }
 
-    fireChangeEvent(value, options) {
+    fireChangeEvent(value, option, options) {
         if (this.props.onChange) {
-            this.props.onChange(value || '', options);
+            this.props.onChange(value || '', option, options);
         }
+    }
+
+    update(options) {
+        this.setState({
+            options
+        });
     }
 }

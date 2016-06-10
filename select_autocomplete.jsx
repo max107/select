@@ -9,7 +9,10 @@ import SelectBase from './select_base';
 
 export default class Select extends SelectBase {
     static propTypes = SelectBase.propTypes;
-    static defaultProps = SelectBase.defaultProps;
+    static defaultProps = {
+        ...SelectBase.defaultProps,
+        minFilterLength: 2
+    };
 
     componentWillMount() {
         super.componentWillMount();
@@ -22,6 +25,17 @@ export default class Select extends SelectBase {
         });
     }
 
+    preload(value) {
+        const { preload } = this.props;
+
+        if (preload) {
+            preload(value);
+        }
+        this.setState({
+            filterValue: value
+        });
+    }
+
     selectOption(currentOption) {
         const { isAsync, valueKey, labelKey } = this.props;
         const { options } = this.state;
@@ -30,7 +44,7 @@ export default class Select extends SelectBase {
             filterValue: currentOption[labelKey] || ''
         }, () => {
             this._unbindCloseMenuIfClickedOutside();
-            this.fireChangeEvent(currentOption[valueKey], isAsync ? this.state.options : options);
+            this.fireChangeEvent(currentOption[valueKey], currentOption, isAsync ? this.state.options : options);
         });
     }
 
@@ -86,18 +100,74 @@ export default class Select extends SelectBase {
     }
 
     handleFilterOptions(e) {
-        if ([18, 13, 27].indexOf(e.keyCode) > -1) {
+        if ([9, 18, 13, 27].indexOf(e.keyCode) > -1) {
             return;
         }
 
+        const { onCreate } = this.props;
         const { filterValue } = this.state;
 
-        let filteredOptions = this.filterOptions(filterValue);
-        this.setState({
-            stateMessage: undefined,
-            options: filteredOptions,
-            isOpen: filteredOptions.length > 0
-        });
+        const { isAsync, onInputChange, onChangeInterval, minFilterLength, minFilterText } = this.props;
+        if (isAsync && onInputChange) {
+            clearTimeout(this._timer);
+
+            if (filterValue.length < minFilterLength) {
+                this.setState({
+                    stateMessage: minFilterText + ' ' + minFilterLength,
+                    all: [],
+                    options: [],
+                    isLoading: false
+                });
+            } else {
+                this._timer = setTimeout(() => {
+                    this.setState({
+                        stateMessage: undefined,
+                        isLoading: true
+                    }, () => {
+                        let promise = onInputChange(filterValue);
+                        if (typeof promise === "object") {
+                            promise.then(options => {
+                                this.setState({
+                                    options,
+                                    isOpen: options.length > 0,
+                                    all: [],
+                                    isLoading: false
+                                });
+                            });
+                        } else {
+                            this.setState({
+                                all: [],
+                                options: [],
+                                isLoading: false
+                            });
+                        }
+                    });
+                }, onChangeInterval);
+            }
+        } else {
+            let filteredOptions = this.filterOptions(filterValue);
+            this.setState({
+                stateMessage: onCreate && filterValue.length > 0 ? this.renderCreateMessage() : undefined,
+                options: filteredOptions,
+                isOpen: filteredOptions.length > 0
+            });
+        }
+    }
+
+    renderSearchInput() {
+        const { name, id } = this.props;
+
+        return (
+            <div className="search-input">
+                <input ref="searchInput" type="text" placeholder="Поиск..." autoComplete="off"
+                       value={this.state.filterValue}
+                       name={name}
+                       id={id}
+                       onBlur={e => this.setState({isOpen: false})}
+                       onChange={e => this.setState({filterValue: e.target.value})}
+                       onKeyUp={this.handleFilterOptions.bind(this)}/>
+            </div>
+        );
     }
 
     render() {
@@ -110,7 +180,6 @@ export default class Select extends SelectBase {
                 <div className="select-input autocomplete"
                      onClick={this.handleOnClickWrapper.bind(this)}>
                     {this.renderSearchInput()}
-
                 </div>
                 <div ref="selectMenuContainer"
                      className={"select-options-container" + (this.state.isOpen ? "" : " hide")}>
