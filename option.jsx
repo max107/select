@@ -21,8 +21,20 @@ export default class Option extends Component {
     };
 
     render() {
-        const { disabled, labelKey, className, onClick, onMouseOver, option, isFocused } = this.props;
-        return <div onClick={onClick} onMouseOver={onMouseOver}
-                    className={className + (isFocused ? ' active' : '') + (disabled ? ' disabled' : '')}>{option[labelKey]}</div>;
+        const {
+            disabled,
+            labelKey,
+            className,
+            onClick,
+            onMouseOver,
+            option,
+            isFocused
+        } = this.props;
+
+        let cls = className + (isFocused ? ' active' : '') + (disabled ? ' disabled' : '');
+
+        return (
+            <div onClick={onClick} onMouseOver={onMouseOver} className={cls}>{option[labelKey]}</div>
+        );
     }
 }

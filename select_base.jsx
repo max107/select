@@ -70,6 +70,7 @@ export default class SelectBase extends Component {
 
     state = {
         all: [],
+        isFocused: false,
         filterValue: '',
         stateMessage: undefined,
         isLoading: false,
@@ -162,9 +163,10 @@ export default class SelectBase extends Component {
     }
 
     findOptionByValue(value, options) {
+        const { valueKey } = this.props;
         options = options || this.props.options;
         for (let key in options) {
-            if (options[key].value == value) {
+            if (options[key][valueKey] == value) {
                 return options[key];
             }
         }
