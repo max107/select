@@ -275,6 +275,7 @@ export default class Select extends Component {
 
     update(options) {
         this.setState({
+            all: options,
             options
         });
     }

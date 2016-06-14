@@ -479,6 +479,7 @@ export default class SelectBase extends Component {
 
     update(options) {
         this.setState({
+            all: options,
             options
         });
     }

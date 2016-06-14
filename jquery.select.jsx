@@ -64,18 +64,17 @@ $.fn.selectizeAutocomplete = function (option) {
     });
 };
 
-$.fn.extend({
-    selectize: function (options) {
-        let defaultOptions = {
-            valueKey: 'value',
-            labelKey: 'label'
-        };
+$.fn.selectize = function (option) {
+    var arg = arguments,
+        settings = typeof option == 'object' && option;
 
-        let settings = {...defaultOptions, ...options};
+    return this.each(function () {
+        var $this = $(this),
+            data = $this.data('selectize');
 
-        return this.each(function (i, el) {
+        if (!data) {
             let $wrapper = $('<div></div>'),
-                $el = $(el);
+                $el = $(this);
             $wrapper.insertAfter($el);
 
             let params = settings.options || [],
@@ -99,9 +98,22 @@ $.fn.extend({
                 ...settings,
                 defaultValue,
                 options: settings.options || params,
-                name: el.getAttribute('name')
+                name: this.getAttribute('name'),
+                id: this.getAttribute('id'),
+                value: this.value
             };
-            ReactDOM.render(<Select {...newParams} />, $wrapper.get(0));
-        });
-    }
-});
+
+            data = ReactDOM.render(<Select {...newParams} />, $wrapper.get(0));
+            $this.data('selectize', data);
+        }
+
+        if (typeof option === 'string') {
+            if (arg.length > 1) {
+                data[option].apply(data, Array.prototype.slice.call(arg, 1));
+            } else {
+                data[option]();
+            }
+        }
+    });
+};
+
